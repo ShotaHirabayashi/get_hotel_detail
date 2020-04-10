@@ -24,14 +24,9 @@ class HotelSpider(scrapy.Spider):
         last_num = (len(response.css(".guide.bottom > .pagerNav").css('a'))-1)
         if response.css(".guide.bottom > .pagerNav").css('a').get() is not None:
             if response.css(".guide.bottom > .pagerNav").css('a')[last_num].xpath('string()').get() ==  '>>':
-                print("================================")
                 next_page = response.css(".guide.bottom > .pagerNav").css('a')[last_num].css('::attr(href)').extract_first()
                 next_page = "https://happyhotel.jp/" + next_page
                 print(next_page)
-                print("================================")
-                print("================================")
-                print("================================")
-                print("================================")
                 yield scrapy.Request(next_page, callback=self.parse_indivi)
 
     def parse_hotel(self,response):
@@ -184,10 +179,12 @@ class HotelSpider(scrapy.Spider):
                     price_title = tr.xpath('string()').re(r'\t\S*\r')
                     # print(price_title)
                     if len(price_title) != 0:
-                        payment_setting_list +=  "<h4>" + price_title[0].replace("\t","").replace('\r',"") + "</h4>"
-                        price_info = tr.xpath('string()').re(r'\t\S*\r')[1:]
-                        p = "".join(price_info)
+                        payment_setting_list +=  "<h4>" + price_title[0].replace("\t","").replace('\r',"") + "</h4>\n"
+                        # price_info = tr.xpath('string()').re(r'\t\S*\r')[1:]
+                        price_info = tr.css("dl").xpath('string()').get().strip().replace( "\r","").replace("\t","")
+                        p = "".join((price_info + "<br>"))
                         payment_setting_list += p.replace('\t','').replace('\r','')
+
 
 
             item["I_td_room_num"] = room_num_con
